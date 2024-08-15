@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Messenger - Online Money Marketing</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #e5e5e5;
+        margin: 0;
+        padding: 0;
+      }
+      #chatContainer {
+        width: 360px;
+        height: 640px;
+        margin: 0 auto;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background-color: #a1d4a1;
+        position: relative;
+      }
+      #chatHeader {
+        background-color: #2a992a;
+        color: white;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      #chatHeader .icons {
+        display: flex;
+        gap: 10px;
+      }
+      #chatMessages {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        background: url("https://www.transparenttextures.com/patterns/cubes.png")
+          #a1d4a1;
+      }
+      .message-container {
+        display: flex;
+        align-items: flex-end;
+        margin-bottom: 10px;
+      }
+      .message {
+        max-width: 75%;
+        padding: 10px 14px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.4;
+        display: inline-block;
+        word-break: break-word;
+        position: relative;
+      }
+      .message.received {
+        background-color: #ffffff;
+        border-bottom-left-radius: 4px;
+        border-top-left-radius: 18px;
+      }
+      .message.user {
+        background-color: #ff9800;
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+        border-top-right-radius: 18px;
+        margin-left: auto;
+      }
+      .message .edit-icon {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        cursor: pointer;
+        color: #888;
+        font-size: 12px;
+        display: none;
+      }
+      .message:hover .edit-icon {
+        display: inline;
+      }
+      .left .edit-icon {
+        display: none;
+      }
+      .left:hover .edit-icon {
+        display: inline;
+      }
+      .avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+      #chatInput {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+        background-color: #f5f5f5;
+      }
+      #messageInput {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 20px;
+        background-color: white;
+        margin-right: 10px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      #messageInput:focus {
+        outline: none;
+      }
+      #chatInput .icons {
+        display: flex;
+        gap: 10px;
+      }
+      #chatInput .icons i {
+        font-size: 20px;
+        color: #888;
+        cursor: pointer;
+      }
+      /* Status Bar */
+      #statusBar {
+        height: 24px;
+        background-color: #2a992a;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 8px;
+        color: white;
+        font-size: 12px;
+      }
+      #statusBar .left {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      #statusBar .right {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      /* Charging Icon */
+      .battery-icon {
+        width: 18px;
+        height: 10px;
+        border: 1px solid white;
+        border-radius: 2px;
+        position: relative;
+      }
+      .battery-icon:before {
+        content: "";
+        width: 3px;
+        height: 4px;
+        background-color: white;
+        position: absolute;
+        top: 2px;
+        right: -4px;
+        border-radius: 1px;
+      }
+      .battery-level {
+        height: 6px;
+        background-color: white;
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        border-radius: 1px;
+      }
+      /* Edit Input */
+      .edit-input {
+        display: none;
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 20px;
+        background-color: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-right: 10px;
+      }
+      /* Download Button */
+      .download-btn {
+        margin-left: 5px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 5px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 360px;
+        margin: 0 auto;
+      }
+      .download-btn:hover {
+        background-color: #45a049;
+      }
+      /* Color Picker Section */
+      .color-picker-container {
+        display: flex;
+        justify-content: center;
+        margin: 10px 0;
+      }
+      .color-picker-container div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 10px;
+      }
+      .color-picker-container input {
+        cursor: pointer;
+      }
+      .color-picker-container div label {
+        margin-bottom: 8px;
+      }
+
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      #editMessageTextarea {
+        width: 100%;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chatContainer">
+      <!-- Status Bar -->
+      <div id="statusBar">
+        <div class="left">
+          <span>1:28 AM</span>
+          <i class="fas fa-edit edit-icon"></i>
+        </div>
+        <div class="right">
+          <i class="fas fa-wifi"></i>
+          <i class="fas fa-signal"></i>
+          <div class="battery-icon">
+            <div class="battery-level" style="width: 70%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="chatHeader">
+        <span>Online Money Mar</span>
+        <div class="icons">
+          <i class="fas fa-video"></i>
+          <i class="fas fa-phone"></i>
+          <i class="fas fa-info-circle"></i>
+        </div>
+      </div>
+      <div id="chatMessages">
+        <div class="message-container">
+          <input type="file" id="avatarInput1" style="display: none" />
+          <img
+            src="https://via.placeholder.com/30"
+            alt="Avatar"
+            class="avatar"
+            id="avatarImg1"
+            onclick="document.getElementById('avatarInput1').click();"
+          />
+          <div class="message received">
+            ইনশাআল্লাহ আল্লাহতালা যেন আপনাদের আমাদের মতো স্টুডেন্টদের ভালো কিছু
+            করার সুযোগ করে দেয় তার অসহায় বান্দাদের জন্য
+            <i class="fas fa-edit edit-icon"></i>
+          </div>
+        </div>
+        <div class="message-container">
+          <input type="file" id="avatarInput2" style="display: none" />
+          <img
+            src="https://via.placeholder.com/30"
+            alt="Avatar"
+            class="avatar"
+            id="avatarImg2"
+            onclick="document.getElementById('avatarInput2').click();"
+          />
+          <div class="message received">
+            Cash In Received.<br />Amount: Tk 1800.00<br />Online: 017XXXXX<br />TxnID:
+            727HXFLS<br />Balance: 1880.56<br />07/10/2023 12:00
+            <i class="fas fa-edit edit-icon"></i>
+          </div>
+        </div>
+        <div class="message-container">
+          <div class="message user">
+            ইনশাআল্লাহ দোয়া করবেন শুধু আমাদের জন্য। আশা করি কালকে কোনো প্রব্লেম
+            হবে না। আর যদি কোনো সমস্যা হয় তাহলে সরাসরি আমাকে কল দেবেন
+            <i class="fas fa-edit edit-icon"></i>
+          </div>
+        </div>
+        <div class="message-container">
+          <input type="file" id="avatarInput3" style="display: none" />
+          <img
+            src="https://via.placeholder.com/30"
+            alt="Avatar"
+            class="avatar"
+            id="avatarImg3"
+            onclick="document.getElementById('avatarInput3').click();"
+          />
+
+          <div class="message received">
+            Ok apu
+            <i class="fas fa-edit edit-icon"></i>
+          </div>
+        </div>
+      </div>
+      <div id="chatInput">
+        <input type="text" id="messageInput" placeholder="Aa" />
+        <div class="icons">
+          <i class="fas fa-camera"></i>
+          <i class="fas fa-image"></i>
+          <i class="fas fa-microphone"></i>
+          <i class="fas fa-plus-circle"></i>
+        </div>
+      </div>
+      <!-- Edit Message Modal -->
+      <div id="editModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <textarea id="editMessageTextarea"></textarea>
+          <button id="saveMessageBtn">Save</button>
+        </div>
+      </div>
+    </div>
+    <div class="color-picker-container">
+      <div>
+        <label for="statusBarColor">Status Bar</label>
+        <input type="color" id="statusBarColor" />
+      </div>
+      <div>
+        <label for="chatHeaderColor">Chat Header</label>
+        <input type="color" id="chatHeaderColor" />
+      </div>
+      <div>
+        <label for="chatMessagesColor">Chat Messages</label>
+        <input type="color" id="chatMessagesColor" />
+      </div>
+    </div>
+    <button class="download-btn" id="downloadBtn">Download Image</button>
+
+    <!-- Include html2canvas library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+      // Function to change background color
+      document
+        .getElementById("statusBarColor")
+        .addEventListener("input", function (e) {
+          document.getElementById("statusBar").style.backgroundColor =
+            e.target.value;
+        });
+
+      document
+        .getElementById("chatHeaderColor")
+        .addEventListener("input", function (e) {
+          document.getElementById("chatHeader").style.backgroundColor =
+            e.target.value;
+        });
+
+      document
+        .getElementById("chatMessagesColor")
+        .addEventListener("input", function (e) {
+          document.getElementById("chatMessages").style.backgroundColor =
+            e.target.value;
+        });
+
+      // Function to download the chatContainer as an image
+      document
+        .getElementById("downloadBtn")
+        .addEventListener("click", function () {
+          html2canvas(document.getElementById("chatContainer")).then(function (
+            canvas
+          ) {
+            // Create an image from the canvas
+            var img = canvas.toDataURL("image/png");
+            // Create a temporary link to download the image
+            var link = document.createElement("a");
+            link.href = img;
+            link.download = "chat-screenshot.png";
+            link.click();
+          });
+        });
+      // Download image function using html2canvas
+      document
+        .getElementById("downloadBtn")
+        .addEventListener("click", function () {
+          html2canvas(document.getElementById("chatContainer")).then(
+            (canvas) => {
+              const link = document.createElement("a");
+              link.href = canvas.toDataURL("image/png");
+              link.download = "chat-screenshot.png";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }
+          );
+        });
+      // Edit existing messages
+      // document.querySelectorAll(".edit-icon").forEach((icon) => {
+      //   icon.addEventListener("click", function () {
+      //     const messageDiv = this.parentElement;
+      //     const messageText = messageDiv.textContent.trim();
+      //     const newMessage = prompt("Edit your message:", messageText);
+
+      //     if (newMessage !== null) {
+      //       messageDiv.textContent = newMessage;
+      //       messageDiv.appendChild(this); // Re-add the icon to the updated message
+      //     }
+      //   });
+      // });
+
+      // Function to add the edit functionality
+      function addEditFunctionality() {
+        document.querySelectorAll(".edit-icon").forEach((icon) => {
+          icon.addEventListener("click", function () {
+            currentMessageDiv = this.parentElement;
+            const messageText = currentMessageDiv.innerHTML
+              .trim()
+              .replace(/<br>/g, "\n");
+            editMessageTextarea.value = messageText;
+            editModal.style.display = "block";
+          });
+        });
+      }
+
+      // Get modal elements
+      const editModal = document.getElementById("editModal");
+      const editMessageTextarea = document.getElementById(
+        "editMessageTextarea"
+      );
+      const saveMessageBtn = document.getElementById("saveMessageBtn");
+      const closeModal = document.querySelector(".close");
+
+      let currentMessageDiv; // To track which message is being edited
+
+      // Initialize edit functionality
+      addEditFunctionality();
+
+      // Save edited message
+      saveMessageBtn.addEventListener("click", function () {
+        const newMessage = editMessageTextarea.value
+          .trim()
+          .replace(/\n/g, "<br>");
+
+        if (newMessage !== "") {
+          currentMessageDiv.innerHTML = newMessage;
+          currentMessageDiv.appendChild(
+            currentMessageDiv.querySelector(".edit-icon")
+          ); // Re-add the icon to the updated message
+        }
+
+        editModal.style.display = "none";
+
+        // Re-add the edit functionality after saving
+        addEditFunctionality();
+      });
+
+      // Close modal
+      closeModal.addEventListener("click", function () {
+        editModal.style.display = "none";
+      });
+
+      // Close modal if user clicks outside of the modal
+      window.addEventListener("click", function (event) {
+        if (event.target == editModal) {
+          editModal.style.display = "none";
+        }
+      });
+
+      // Send new messages
+      document
+        .getElementById("messageInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") sendMessage();
+        });
+
+      function sendMessage() {
+        const messageInput = document.getElementById("messageInput");
+        const messageText = messageInput.value.trim();
+
+        if (messageText === "") return;
+
+        const messageContainer = document.createElement("div");
+        messageContainer.classList.add("message-container");
+
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("message", "user");
+        messageDiv.textContent = messageText;
+
+        const editIcon = document.createElement("i");
+        editIcon.classList.add("fas", "fa-edit", "edit-icon");
+
+        editIcon.addEventListener("click", function () {
+          const newMessage = prompt("Edit your message:", messageText);
+          if (newMessage !== null) {
+            messageDiv.textContent = newMessage;
+            messageDiv.appendChild(editIcon);
+          }
+        });
+
+        messageDiv.appendChild(editIcon);
+        messageContainer.appendChild(messageDiv);
+
+        document.getElementById("chatMessages").appendChild(messageContainer);
+        messageInput.value = "";
+        document.getElementById("chatMessages").scrollTop =
+          document.getElementById("chatMessages").scrollHeight;
+      }
+
+      document.querySelectorAll('input[type="file"]').forEach((input) => {
+        input.addEventListener("change", (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const img = document.getElementById(
+              event.target.id.replace("Input", "Img")
+            );
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
